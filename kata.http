@@ -23,3 +23,81 @@ Content-Type: application/json
 DELETE http://localhost:55575/article_filtered_stream
 Content-Type: application/json
 
+
+### 인덱스 생성 테스트
+PUT http://localhost:55575/index_test?pretty
+Content-Type: application/json
+
+### 비멱등성 일반 post 방식
+POST http://localhost:55575/index_test/_doc
+Content-Type: application/json
+
+{
+  "title": "test",
+  "content": "test",
+  "rating": 7
+}
+
+
+### 문서 생성 / 전체 수정 - id 를 명시하여 멱등성이 유지되는 멱등성 post 방식 - 사실상 put이랑 동일하게 동작하게 설계해둠
+POST http://localhost:55575/index_test/_doc/1
+Content-Type: application/json
+
+{
+  "title": "test",
+  "content": "test"
+}
+
+
+### 생성 문서 조회
+GET http://localhost:55575/index_test/_search
+
+
+### 문서 수정 - restful put 으로 replace
+PUT http://localhost:55575/index_test/_doc/1?pretty
+Content-Type: application/json
+
+{
+  "content": "test2"
+}
+
+
+### 문서 부분 수정
+POST http://localhost:55575/index_test/_update/1
+Content-Type: application/json
+
+{
+  "doc": {
+    "content": "test3"
+  }
+}
+
+
+
+### 검색
+### 검색어가 포함된 문서 검색
+GET http://localhost:55575/index_test/_search?q=test
+
+
+### 필터로
+GET http://localhost:55575/index_test/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match": {
+          "content": "test"
+        }
+      },
+      "filter": {
+        "range": {
+          "rating": {
+            "gte": 7
+          }
+        }
+      }
+    }
+  }
+}
