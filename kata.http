@@ -198,7 +198,7 @@ Content-Type: application/json
 
 
 ### 토크나이징 확인하기
-POST http://localhost:55575/_analyze
+POST http://localhost:9200/_analyze
 Content-Type: application/json
 
 {
@@ -216,7 +216,7 @@ Content-Type: application/json
 }
 
 ### article_filtered_stream 아날라이저 확인 - 한글 형태소 분석기 + 엣지 ngram 으로 튜닝해둔상태
-POST http://localhost:55575/article_filtered_stream/_analyze
+POST http://localhost:9200/article_filtered_stream/_analyze
 Content-Type: application/json
 
 {
@@ -225,7 +225,7 @@ Content-Type: application/json
 }
 
 ### 아날라이저 구성요소 보기
-GET http://localhost:55575/article_filtered_stream/_settings
+GET http://localhost:9200/article_filtered_stream/_settings
 #
 #        "analysis": {
 #          "analyzer": {
@@ -260,8 +260,11 @@ POST http://localhost:45321/test/add
 
 
 ### api test - 기본 키워드 검색
-GET http://localhost:45321/test/search2?keyword=잘되나
+GET http://localhost:45321/test/search2?keyword=잘
 
+
+### 엣지 엔그람 검색
+GET http://localhost:45321/test/search3?keyword=잘되
 
 
 ###
@@ -282,4 +285,26 @@ Content-Type: application/json
       }
     }
   }
+}
+
+
+### 엔그람
+GET http://localhost:9200/article_filtered_stream/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "CONTENTS.ngram": "내용잘되나"
+    }
+  }
+}
+
+###
+POST http://localhost:9200/article_filtered_stream/_analyze
+Content-Type: application/json
+
+{
+"analyzer": "edge_ngram_analyzer",
+"text": "내용잘되나"
 }

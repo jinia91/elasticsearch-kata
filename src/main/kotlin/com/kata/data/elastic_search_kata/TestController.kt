@@ -57,6 +57,29 @@ class TestController(
         return Response(result.map { it.content }.toList())
     }
 
+    @GetMapping("/search3")
+    fun searchArticlesByKeyword3(@RequestParam keyword: String): Response {
+        val query = NativeQuery.builder()
+            .withQuery { q ->
+                q.bool { b ->
+                    b.must { m ->
+                        m.match { mm -> mm.query("PUBLISHED").field("STATUS") }
+                    }
+                    b.must { m ->
+                        m.match { mm -> mm.query(keyword).field("TITLE.ngram").boost(2.0f) }
+                    }
+                    b.must { m ->
+                        m.match { mm -> mm.query(keyword).field("CONTENTS.ngram") }
+                    }
+                }
+            }
+            .withPageable(PageRequest.of(0, 30))
+            .build()
+
+        val result = elasticsearchOperations.search(query, Article::class.java)
+        return Response(result.map { it.content }.toList())
+    }
+
     @PostMapping("/add")
     fun addTestArticles() {
         // 검색을 사용할것이므로 다양한 검색 패턴 무작위
