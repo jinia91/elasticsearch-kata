@@ -1,0 +1,25 @@
+### 엘라스틱 서치 기본 검색 템플릿
+GET http://localhost:55575/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+
+### 타입 명시 후 단건 검색
+GET http://localhost:55575/article_filtered_stream/_doc/367289438580768
+Content-Type: application/json
+
+
+### 단건 삭제
+DELETE http://localhost:55575/article_filtered_stream/_doc/367289438580768
+Content-Type: application/json
+
+
+### 인덱스 전체 삭제
+DELETE http://localhost:55575/article_filtered_stream
+Content-Type: application/json
+
