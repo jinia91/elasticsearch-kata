@@ -264,7 +264,7 @@ GET http://localhost:45321/test/search2?keyword=잘
 
 
 ### 엣지 엔그람 검색
-GET http://localhost:45321/test/search3?keyword=잘되
+GET http://localhost:45321/test/search3?keyword=내
 
 
 ###

@@ -65,12 +65,13 @@ class TestController(
                     b.must { m ->
                         m.match { mm -> mm.query("PUBLISHED").field("STATUS") }
                     }
-                    b.must { m ->
-                        m.match { mm -> mm.query(keyword).field("TITLE.ngram").boost(2.0f) }
+                    b.should { s ->
+                        s.match { mm -> mm.query(keyword).field("TITLE.ngram").boost(2.0f) }
                     }
-                    b.must { m ->
-                        m.match { mm -> mm.query(keyword).field("CONTENTS.ngram") }
+                    b.should { s ->
+                        s.match { mm -> mm.query(keyword).field("CONTENTS.ngram") }
                     }
+                    b.minimumShouldMatch("1")
                 }
             }
             .withPageable(PageRequest.of(0, 30))
