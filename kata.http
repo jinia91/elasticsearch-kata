@@ -254,3 +254,32 @@ GET http://localhost:55575/article_filtered_stream/_settings
 #          }
 #        }
 
+
+### 테스트 데이터
+POST http://localhost:45321/test/add
+
+
+### api test - 기본 키워드 검색
+GET http://localhost:45321/test/search2?keyword=잘되나
+
+
+
+###
+GET http://localhost:9200/article_filtered_stream/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "TITLE": "잘되나" } },
+        { "match": { "CONTENTS": "잘되나" } }
+      ],
+      "filter": {
+        "term": {
+          "STATUS": "DRAFT"
+        }
+      }
+    }
+  }
+}
