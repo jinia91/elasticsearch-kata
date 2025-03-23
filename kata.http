@@ -18,6 +18,9 @@ Content-Type: application/json
 DELETE http://localhost:55575/article_filtered_stream/_doc/367289438580768
 Content-Type: application/json
 
+### 인덱스 매핑 확인
+GET http://localhost:55575/article_filtered_stream/_mapping
+
 
 ### 인덱스 전체 삭제
 DELETE http://localhost:55575/article_filtered_stream
@@ -101,3 +104,62 @@ Content-Type: application/json
     }
   }
 }
+
+
+### 토크나이징 확인하기
+POST http://localhost:55575/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "standard",
+  "text": "한글의 경우는 어떻게 토크나이징되는지 한번 보자"
+}
+
+### 한글 토크나이징 형태소 분석기 써보기
+POST http://localhost:55575/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "nori",
+  "text": "한글의 경우는 어떻게 Tokenizing 되는지 한번 보자"
+}
+
+### article_filtered_stream 아날라이저 확인 - 한글 형태소 분석기 + 엣지 ngram 으로 튜닝해둔상태
+POST http://localhost:55575/article_filtered_stream/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "edge_ngram_analyzer",
+  "text": "한글의 경우는 어떻게 Tokenizing 되는지 한번 보자"
+}
+
+### 아날라이저 구성요소 보기
+GET http://localhost:55575/article_filtered_stream/_settings
+#
+#        "analysis": {
+#          "analyzer": {
+#            "korean": { (아날라이저 1, 형태소 아날라이저)
+#              "type": "custom",
+#              "tokenizer": "nori_tokenizer"
+#            },
+#            "edge_ngram_analyzer": { (아날라이저 2, 엣지 ngram 아날라이저)
+#              "filter": [
+#                "lowercase"
+#              ],
+#              "type": "custom",
+#              "tokenizer": "edge_ngram_tokenizer"
+#            }
+#          },
+#          "tokenizer": {
+#            "edge_ngram_tokenizer": {
+#              "token_chars": [
+#                "letter",
+#                "digit"
+#              ],
+#              "min_gram": "1",
+#              "type": "edge_ngram",
+#              "max_gram": "20"
+#            }
+#          }
+#        }
+
