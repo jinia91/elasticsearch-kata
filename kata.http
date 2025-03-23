@@ -1,5 +1,5 @@
 ### 엘라스틱 서치 기본 검색 템플릿
-GET http://localhost:55575/_search
+GET http://localhost:9200/_search
 Content-Type: application/json
 
 {
@@ -8,31 +8,122 @@ Content-Type: application/json
   }
 }
 
+### 인덱스 삽입
+PUT http://localhost:9200/article_filtered_stream
+Content-Type: application/json
+
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "korean": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer"
+        },
+        "edge_ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "edge_ngram_tokenizer",
+          "filter": ["lowercase"]
+        }
+      },
+      "tokenizer": {
+        "edge_ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20,
+          "token_chars": ["letter", "digit"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "ID": {
+        "type": "long"
+      },
+      "STATUS": {
+        "type": "keyword"
+      },
+      "TITLE": {
+        "type": "text",
+        "analyzer": "korean",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "ngram": {
+            "type": "text",
+            "analyzer": "edge_ngram_analyzer"
+          }
+        }
+      },
+      "CONTENTS": {
+        "type": "text",
+        "analyzer": "korean",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "ngram": {
+            "type": "text",
+            "analyzer": "edge_ngram_analyzer"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+### 단건 삽입
+POST http://localhost:9200/article_filtered_stream/_doc/367289438580768
+Content-Type: application/json
+
+{
+  "ID": 367289438580768,
+  "STATUS": "DRAFT",
+  "TITLE": "한글 테스트",
+  "CONTENTS": "한글 테스트 컨텐츠"
+}
 
 ### 타입 명시 후 단건 검색
-GET http://localhost:55575/article_filtered_stream/_doc/367289438580768
+GET http://localhost:9200/article_filtered_stream/_doc/367289438580768
 Content-Type: application/json
+
+### 쿼리 검색
+GET http://localhost:9200/article_filtered_stream/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "CONTENTS": "한글"
+    }
+  }
+}
 
 
 ### 단건 삭제
-DELETE http://localhost:55575/article_filtered_stream/_doc/367289438580768
+DELETE http://localhost:9200/article_filtered_stream/_doc/367289438580768
 Content-Type: application/json
 
 ### 인덱스 매핑 확인
-GET http://localhost:55575/article_filtered_stream/_mapping
+GET http://localhost:9200/article_filtered_stream/_mapping
 
 
 ### 인덱스 전체 삭제
-DELETE http://localhost:55575/article_filtered_stream
+DELETE http://localhost:9200/article_filtered_stream
 Content-Type: application/json
 
 
 ### 인덱스 생성 테스트
-PUT http://localhost:55575/index_test?pretty
+PUT http://localhost:9200/index_test?pretty
 Content-Type: application/json
 
 ### 비멱등성 일반 post 방식
-POST http://localhost:55575/index_test/_doc
+POST http://localhost:9200/index_test/_doc
 Content-Type: application/json
 
 {
@@ -43,7 +134,7 @@ Content-Type: application/json
 
 
 ### 문서 생성 / 전체 수정 - id 를 명시하여 멱등성이 유지되는 멱등성 post 방식 - 사실상 put이랑 동일하게 동작하게 설계해둠
-POST http://localhost:55575/index_test/_doc/1
+POST http://localhost:9200/index_test/_doc/1
 Content-Type: application/json
 
 {
@@ -53,11 +144,11 @@ Content-Type: application/json
 
 
 ### 생성 문서 조회
-GET http://localhost:55575/index_test/_search
+GET http://localhost:9200/index_test/_search
 
 
 ### 문서 수정 - restful put 으로 replace
-PUT http://localhost:55575/index_test/_doc/1?pretty
+PUT http://localhost:9200/index_test/_doc/1?pretty
 Content-Type: application/json
 
 {
@@ -66,7 +157,7 @@ Content-Type: application/json
 
 
 ### 문서 부분 수정
-POST http://localhost:55575/index_test/_update/1
+POST http://localhost:9200/index_test/_update/1
 Content-Type: application/json
 
 {
@@ -79,7 +170,7 @@ Content-Type: application/json
 
 ### 검색
 ### 검색어가 포함된 문서 검색
-GET http://localhost:55575/index_test/_search?q=test
+GET http://localhost:9200/index_test/_search?q=test
 
 
 ### 필터로

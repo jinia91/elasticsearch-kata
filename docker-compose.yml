@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  elastic-search:
+    image: bitnami/elasticsearch:8.17.3
+    container_name: elastic-search
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ELASTICSEARCH_PLUGINS=analysis-nori
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+volumes:
+  elasticsearch-data:
+    driver: local
